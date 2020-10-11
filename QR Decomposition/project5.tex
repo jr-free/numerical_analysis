@@ -1,0 +1,239 @@
+\documentclass[a4paper, 12pt, twoside]{article}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Joseph Free \\ MATH 3261 \\ Project 5}
+\lhead{QR Decomposition and Least Squares Solutions}
+\addtolength{\headheight}{41.7pt}
+\cfoot{\thepage}
+
+\begin{document}
+\section{Problem}
+In this assignment we will be obtaining the least squares solution to the system
+
+\begin{equation}
+\label{one}
+\begin{array}{rrrrr}
+3x& - & 2y &= & 3 \\
+  &   & 2y &= & 5\\
+4x& + & 4y &= & 4\\ 
+\end{array}
+\end{equation}
+by using $QR$ decomposition. The assignment will be carried out in four parts. In the first and second parts, we will use the Gram-Schmidt process and Householder transformations, respectively, to find the $QR$ decomposition of the coefficient matrix of the system above. In the third part, we will use a matlab command to generate the QR decomposition. The fourth part will contain the solution of (\ref{one}).
+
+\subsection{Part 1: Gram-Schmidt}
+Recall that a $QR$ decomposition of an $n \times k$ matrix $A$ is a factorization of A into the product $QR$, where $Q$ is an $n \times k$ orthogonal matrix ($Q^TQ = I$) and $R$ is a $k \times \ k$ upper triangular matrix.
+Using the Gram-Schmidt process allows us to determine the columns of the matrix $Q$ by using the columns of $A$ as the set of vectors to orthonormalize. After obtaining Q, we can use the identity 
+\begin{equation}
+R = Q^TA
+\end{equation}
+to compute the individual components of R.
+
+Proceeding with the Gram-Schmidt process using vectors $a_1 = (3,0,4)^t$,
+$a_2 = (-2, 3, 4)^t$ from
+$$
+A=
+\begin{bmatrix}
+	3 & -2\\ 0 & 3\\ 4 & 4\\
+\end{bmatrix}
+$$
+we obtain the following orthonormal vectors
+
+$$ u_1 = \frac{a_1}{\lvert a_1 \rvert} = (\frac{3}{5},0,\frac{4}{5})^t$$
+$$u_2 = \frac{w_2}{\lvert w_2 \rvert} = (\frac{-16}{25}, \frac{3}{5}, \frac{12}{25})^t$$
+where $w_2 = {a_1} - (a_2u_1)u_1 = (-16/5, 3, 12/5)^t$. Using these vectors as the columns of $Q$, we have
+$$
+Q = 
+\begin{bmatrix}
+	3/5& & &-16/25\\
+	0& & &	3/5\\
+	4/5& & & 12/25\\	
+\end{bmatrix}.
+$$
+
+Then, since A is $3 \times 2$, we know that $R$ must be $2 \times 2$. So by using (2), we obtain
+
+$$
+R = 
+\begin{bmatrix}
+	5 & 2\\
+	0 & 5\\
+\end{bmatrix}
+$$.
+
+We conclude that 
+$$
+A
+=
+\begin{bmatrix}
+3/5& & &-16/25\\
+0& & &	3/5\\
+4/5& & & 12/25\\	
+\end{bmatrix}.
+\begin{bmatrix}
+5 & 2\\
+0 & 5\\
+\end{bmatrix}
+= QR
+$$
+
+\subsection{Part 2: Householder Transformations}
+
+Using A as defined in part 1, we wish to apply orthogonal transformations $H_1, H_2$ to A in order to zero the entries below the main diagonal. If we take $Q = (H_2H_1)^T$, then we see that the resultant product $H_2H_1A = R$, as $A=QR$, hence $Q^TA = Q^TQR = R.$ 
+
+Using the definition of the Householder reflector, we take $H_1 = I - 2u_1u_1^t$ where $u_1 = a_1 + sgn(a_1)\lVert a_1 \rVert e$ and $e = (1,0,0)^t$. Thus,
+
+$$
+u_1 = \frac{(3,0,4)^t + 5(1,0,0)^t}{\lVert (3,0,2)^t + 5(1,0,0)^t \rVert}
+= \frac{1}{\sqrt{5}}(2,0,1)^t
+$$
+
+And
+
+$$
+H_1 = \frac{1}{5}
+\begin{bmatrix}
+-3 & 0 & -4 \\
+0 & 0 & 0 \\
+-4 & 0 & 3 \\
+\end{bmatrix}
+$$
+
+Multiplying by A, we get
+
+$$
+H_1A =
+\begin{bmatrix}
+-5 & -2 \\ 0 & 3 \\ 0 & 4 \\
+\end{bmatrix}
+$$
+
+Proceeding in a similar manner using the vector $a_2 = (3,4)^t$ from the second column of $H_1A$, we construct $u_2 = \frac{1}{\sqrt{5}} (2,1)^t$, from which we find $H_2$ to be
+
+$$
+H_2 = \frac{1}{5}
+\begin{bmatrix}
+-3 & -4 \\
+-4 & 3 \\
+\end{bmatrix}
+$$ 
+
+Multiplying $H_2$ by the block (vector, really) containing $a_2$, we obtain
+
+$$
+H_2A_{2:3,2} =
+\frac{1}{5}
+\begin{bmatrix}
+-3 & -4 \\
+-4 & 3 \\
+\end{bmatrix}
+\begin{pmatrix}
+3 \\ 4
+\end{pmatrix}
+=
+\begin{pmatrix}
+-5 \\ 0
+\end{pmatrix}
+$$
+
+Putting this all together, we may conclude that the upper triangular matrix R is given by
+
+$$
+R = 
+\begin{bmatrix}
+-5 & -2 \\
+0 & -5 \\
+0 & 0 \\
+\end{bmatrix}.
+$$
+
+We may then construct Q as the product of $H_1$ and $\tilde{H}_2$, where 
+
+$$
+\tilde{H}_2 = \begin{bmatrix} 1 & 0 \\ 0 & H_2\\ \end{bmatrix}
+$$
+
+Thus, $Q$ is given by
+
+$$
+Q = 
+\frac{1}{5}
+\begin{bmatrix}
+-3 & 0 & -4 \\
+0 & 0 & 0 \\
+-4 & 0 & 3 \\
+\end{bmatrix}
+\begin{bmatrix}
+1 & 0 & 0 \\
+0 &-3/5 & -4/5 \\
+0 &-4/5 & 3/5 \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+-3/5 & 16/25 & -12/25 \\
+0 &0 &0 \\
+-4/5& -12/25 & 9/25 \\
+\end{bmatrix}.
+$$
+
+\pagebreak
+
+\subsection*{Part 3: MATLAB}
+
+Using the qr function in MATLAB, the following results are generated.
+
+\begin{verbatim}
+>> A = [3 -2; 0 3; 4 4] 
+
+A =
+
+3    -2
+0     3
+4     4
+
+>> [Q, R] = qr(A)
+
+Q =
+
+-0.6000    0.6400   -0.4800
+0   -0.6000   -0.8000
+-0.8000   -0.4800    0.3600
+
+R =
+
+-5    -2
+0    -5
+0     0
+
+\end{verbatim}
+
+\subsection{Part 4: Least Squares Solution}
+
+Using the Gram-Schmidt QR decomposition, the solution to the system can be found by solving 
+
+$$
+\begin{bmatrix}
+5 & 2 \\ 0 & 5\\
+\end{bmatrix}
+\begin{bmatrix} x \\ y \end{bmatrix}
+= 
+\begin{bmatrix}
+3/5& & &-16/25\\
+0 & & & 3/5\\
+4/5& & & 12/25\\	
+\end{bmatrix}^T
+\begin{bmatrix} 3 \\ 5 \\ 4 \end{bmatrix}
+$$
+
+By using any conventional method, we find the solution to be
+
+$$
+\begin{bmatrix} x \\ y \end{bmatrix}
+=
+\begin{bmatrix} 19/25 \\ 3/5 \end{bmatrix}
+$$
+
+\end{document}
